@@ -10,6 +10,7 @@ app.use(express.json());
 //Variáveis Globais
 const users = [];  // Lista de objetos [{ username: "", avatar: "" }]
 const tweets = [];  // Lista de objetos [{ username: "", avatar: "", tweet: "" }]
+const PORT = 5000;
 
 let teste
 
@@ -18,6 +19,13 @@ let teste
 app.post('/sign-up', (req, res) => {
    
     const user = req.body;
+
+    //validação
+    if(!user.username || !user.avatar) {
+        res.status(400).send('Todos os campos são obrigatórios!');
+    }
+    
+
     users.push(user);
 
     res.status(201).send("OK");
@@ -30,13 +38,19 @@ app.post('/sign-up', (req, res) => {
 app.post('/tweets', (req, res) => {
 
     const tweet = req.body;
+
+    //validação
+    if(!tweet.tweet) {
+        res.status(400).send('Todos os campos são obrigatórios!');
+    }
+
     const avatar = users.find(user => user.username === tweet.username).avatar;
     tweets.push({
         username: tweet.username,
         avatar: avatar,
         tweet: tweet.tweet
     });
-    res.send("OK");
+    res.status(201).send("OK");
 });
 
 
@@ -56,4 +70,7 @@ app.get('/tweets', (req, res) => {
 
 
 
-app.listen(5000);
+app.listen(PORT, function(err){
+    if(err) console.log(err);
+    console.log("Server listening on PORT: ", PORT);
+});
