@@ -23,12 +23,10 @@ app.post('/sign-up', (req, res) => {
     //validação
     if(!user.username || !user.avatar) {
         res.status(400).send('Todos os campos são obrigatórios!');
+    } else {
+        users.push(user);
+        res.status(201).send("OK");
     }
-    
-
-    users.push(user);
-
-    res.status(201).send("OK");
 });
 
 
@@ -38,16 +36,19 @@ app.post('/sign-up', (req, res) => {
 app.post('/tweets', (req, res) => {
 
     const tweet = req.body;
+    const avatar = users.find(user => user.username === tweet.username);
 
     //validação
-    if(!tweet.tweet) {
+    if(!tweet.tweet || !tweet.username) {
         res.status(400).send('Todos os campos são obrigatórios!');
     }
+    if(!avatar) {
+        res.status(401).send('Usuário não está logado!')
+    }
 
-    const avatar = users.find(user => user.username === tweet.username).avatar;
     tweets.push({
         username: tweet.username,
-        avatar: avatar,
+        avatar: avatar.avatar,
         tweet: tweet.tweet
     });
     res.status(201).send("OK");
@@ -65,6 +66,20 @@ app.get('/tweets', (req, res) => {
     listaDeTweetsMaisNovos = aux.splice(0,10);
 
     res.send(listaDeTweetsMaisNovos);
+
+});
+
+
+
+
+//GET USER TWEETS 
+app.get('/tweets/:userName', (req, res) => {
+
+    const userName = req.params.userName;
+    let listaDeTweetsDoUsuario = [];
+    listaDeTweetsDoUsuario = tweets.filter(user => user.username === userName)
+
+    res.send(listaDeTweetsDoUsuario);
 
 });
 
